@@ -1,0 +1,114 @@
+/* ---------- Base Styles ---------- */
+body {
+    margin: 0;
+    font-family: Georgia, serif;
+    background-color: #000;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ---------- Hero Section ---------- */
+.hero {
+    text-align: center;
+    padding: 80px 20px 60px;
+}
+
+.ou-logo {
+    width: 130px;
+    height: 130px;
+    object-fit: contain;
+}
+
+.hero-title {
+    font-size: 4.5rem;
+    color: #FFD700;
+    letter-spacing: 4px;
+    margin-top: 20px;
+}
+
+.divider {
+    width: 250px;
+    height: 2px;
+    margin: 16px auto;
+    background: linear-gradient(to right, transparent, #FFD700, transparent);
+}
+
+.hero-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-style: italic;
+    font-size: 1.5rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* ---------- Features Section ---------- */
+.features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+    padding: 80px 20px;
+    max-width: 1000px;
+    width: 100%;
+}
+
+.feature-card {
+    background-color: #18181b;
+    border: 2px solid rgba(255, 215, 0, 0.2);
+    border-radius: 16px;
+    padding: 32px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.feature-card:hover {
+    border-color: #FFD700;
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(255, 215, 0, 0.2);
+}
+
+.icon-container {
+    width: 64px;
+    height: 64px;
+    background-color: rgba(255, 215, 0, 0.1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.icon-container img {
+    width: 32px;
+    height: 32px;
+}
+
+.feature-card h2 {
+    color: #FFD700;
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+}
+
+.feature-card p {
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 16px;
+}
+
+.cta {
+    color: #FFD700;
+    display: inline-block;
+    transition: transform 0.3s;
+}
+
+.feature-card:hover .cta {
+    transform: translateX(6px);
+}
+
+/* ---------- Footer ---------- */
+footer {
+    border-top: 1px solid rgba(255, 215, 0, 0.2);
+    padding: 24px 0;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+}
