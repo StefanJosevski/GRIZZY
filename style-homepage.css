@@ -1,4 +1,3 @@
-/* ---------- Base Styles ---------- */
 body {
     margin: 0;
     font-family: Georgia, serif;
@@ -9,7 +8,6 @@ body {
     align-items: center;
 }
 
-/* ---------- Hero Section ---------- */
 .hero {
     text-align: center;
     padding: 80px 20px 60px;
@@ -43,7 +41,6 @@ body {
     margin: 0 auto;
 }
 
-/* ---------- Features Section ---------- */
 .features {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -105,7 +102,6 @@ body {
     transform: translateX(6px);
 }
 
-/* ---------- Footer ---------- */
 footer {
     border-top: 1px solid rgba(255, 215, 0, 0.2);
     padding: 24px 0;

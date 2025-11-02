@@ -1,4 +1,3 @@
-// Select all feature cards
 document.querySelectorAll('.feature-card').forEach(card => {
     card.addEventListener('click', () => {
         const path = card.getAttribute('data-path');
