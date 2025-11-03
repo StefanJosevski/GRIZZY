@@ -4,8 +4,8 @@ document.querySelectorAll('.feature-card').forEach(card => {
 
         if (path === "/gpa-calculator") {
             window.location.href = "grizzy.html";
-        } else {
-            alert(`"${path}" feature coming soon!`);
+        } else if (path === "/study-buddy") {
+            window.location.href = "Study_Buddy.html";
         }
     });
 });

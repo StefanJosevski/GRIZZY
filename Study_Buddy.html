@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Grizzy • Study Buddy</title>
+
+    <style>
+        /* === Color tokens tuned to your screenshot === */
+        :root {
+            --page: #faf4ec;
+            /* very light cream page */
+            --panel: #fff5df;
+            /* large panel bg */
+            --card: #fff7e8;
+            /* inner dial bg */
+            --ring: #e9ecff;
+            /* faint blue ring */
+            --gold: #b8922d;
+            /* primary button gold */
+            --text: #111111;
+            /* timer text */
+            --muted: #6a6a6a;
+            /* status text */
+            --white: #ffffff;
+            --border-soft: #e6e6ee;
+            --shadow: 0 12px 28px rgba(0, 0, 0, .10);
+            --radius: 22px;
+            --radius-btn: 14px;
+        }
+
+        body {
+            margin: 0;
+            font-family: Georgia, serif;
+            background: var(--page);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Header */
+        .hero {
+            width: min(980px, 92vw);
+            text-align: left;
+            padding: 38px 8px 6px;
+        }
+
+        .hero h1 {
+            margin: 0 0 6px 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .hero .sub {
+            margin: 0;
+            color: #5a5a5a;
+            font-size: 16px;
+        }
+
+        /* Panel */
+        .panel {
+            width: min(980px, 92vw);
+            background: var(--panel);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 26px 28px 40px;
+            margin: 18px 0 46px;
+        }
+
+        /* Timer card */
+        .timer {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, .06);
+            padding: 32px 16px 26px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Dial */
+        .dial {
+            width: clamp(260px, 46vw, 420px);
+            height: clamp(260px, 46vw, 420px);
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: radial-gradient(closest-side, #ffffff 66%, transparent 67%),
+                conic-gradient(#eef2ff 0deg, #eef2ff 360deg);
+            box-shadow: inset 0 0 0 14px var(--ring);
+        }
+
+        .clock {
+            width: 26px;
+            height: 26px;
+            opacity: .7;
+            margin: 0 auto 8px;
+        }
+
+        .time {
+            font-size: clamp(58px, 10vw, 88px);
+            font-weight: 800;
+            letter-spacing: .5px;
+            text-align: center;
+            line-height: 1;
+            color: var(--text);
+        }
+
+        .status {
+            margin-top: 10px;
+            color: var(--muted);
+            text-align: center;
+            font-size: 16px;
+        }
+
+        /* Controls */
+        .controls {
+            margin-top: 28px;
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border-radius: var(--radius-btn);
+            padding: 12px 18px;
+            border: 1.5px solid var(--border-soft);
+            background: var(--white);
+            color: #1c1c1c;
+            font-weight: 700;
+            box-shadow: 0 3px 0 rgba(0, 0, 0, .08), 0 8px 20px rgba(0, 0, 0, .06);
+            cursor: pointer;
+            transition: transform .02s ease, box-shadow .2s ease, filter .1s ease;
+            user-select: none;
+        }
+
+        .btn:active {
+            transform: translateY(1px)
+        }
+
+        .btn:disabled {
+            opacity: .55;
+            cursor: not-allowed
+        }
+
+        .btn.primary {
+            background: var(--gold);
+            color: #0f0d05;
+            border-color: rgba(0, 0, 0, .10);
+            box-shadow: 0 3px 0 rgba(0, 0, 0, .14), 0 8px 20px rgba(184, 146, 45, .25);
+        }
+
+        .btn.primary:active {
+            filter: brightness(.97);
+        }
+
+        .btn .ico {
+            width: 16px;
+            height: 16px;
+            display: block
+        }
+    </style>
+</head>
+
+<body>
+    <section class="hero">
+        <h1>Study Buddy</h1>
+        <p class="sub">Stay focused and track your progress with our Pomodoro timer</p>
+    </section>
+
+    <section class="panel">
+        <div class="timer" aria-label="Study Timer">
+            <div class="dial" aria-live="polite">
+                <div style="text-align:center">
+                    <svg class="clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <circle cx="12" cy="12" r="8" stroke="currentColor"></circle>
+                        <path d="M12 8v5l3 2" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
+                    <div id="time" class="time">25:00</div>
+                    <div id="state" class="status">Ready to Focus</div>
+                </div>
+            </div>
+
+            <div class="controls" role="group" aria-label="Timer controls">
+                <button id="btnStart" class="btn primary">
+                    <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M8 5v14l11-7-11-7z"></path>
+                    </svg>
+                    Start
+                </button>
+
+                <button id="btnPause" class="btn" disabled>
+                    <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M7 5h4v14H7zM13 5h4v14h-4z"></path>
+                    </svg>
+                    Pause
+                </button>
+
+                <button id="btnReset" class="btn">
+                    <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M12 6V3L7 7l5 4V8a4 4 0 1 1-3.46 6.03l-1.66 1.11A6 6 0 1 0 12 6z"></path>
+                    </svg>
+                    Reset
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Minimal Pomodoro logic (25:00 default)
+        const timeEl = document.getElementById('time');
+        const stateEl = document.getElementById('state');
+        const btnStart = document.getElementById('btnStart');
+        const btnPause = document.getElementById('btnPause');
+        const btnReset = document.getElementById('btnReset');
+
+        let seconds = 25 * 60;
+        let timerId = null;
+        let running = false;
+
+        const fmt = (s) => {
+            const m = Math.floor(s / 60).toString().padStart(2, '0');
+            const r = (s % 60).toString().padStart(2, '0');
+            return m + ':' + r;
+        };
+
+        const paint = () => { timeEl.textContent = fmt(seconds); };
+
+        const setRunning = (on) => {
+            running = on;
+            btnStart.disabled = on;
+            btnPause.disabled = !on;
+        };
+
+        function tick() {
+            seconds = Math.max(0, seconds - 1);
+            paint();
+            if (seconds === 0) {
+                clearInterval(timerId);
+                timerId = null;
+                setRunning(false);
+                stateEl.textContent = 'Session complete! Take a short break.';
+            }
+        }
+
+        function start() {
+            if (running) return;
+            setRunning(true);
+            stateEl.textContent = 'Focusing…';
+            timerId = setInterval(tick, 1000);
+        }
+
+        function pause() {
+            if (!running) return;
+            clearInterval(timerId);
+            timerId = null;
+            setRunning(false);
+            stateEl.textContent = 'Paused';
+        }
+
+        function reset() {
+            clearInterval(timerId);
+            timerId = null;
+            seconds = 25 * 60;
+            setRunning(false);
+            paint();
+            stateEl.textContent = 'Ready to Focus';
+        }
+
+        btnStart.addEventListener('click', start);
+        btnPause.addEventListener('click', pause);
+        btnReset.addEventListener('click', reset);
+
+        paint();
+    </script>
+</body>
+
+</html>
