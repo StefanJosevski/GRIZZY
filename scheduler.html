@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OU Smart Scheduler</title>
+  <link rel="stylesheet" href="style-scheduler.css" />
+</head>
+<body>
+
+  <div class="app">
+    <header class="app-header">
+      <div class="logo-title">
+        <div class="logo">G</div>
+        <div>
+          <h1>Grizzy</h1>
+          <p class="muted">The OU Student Hub</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <div class="select">
+          <label for="term" class="sr-only">Term</label>
+          <select id="term" class="select-input">
+            <option>Winter 2026</option>
+            <option selected>Fall 2025</option>
+            <option>Summer 2025</option>
+          </select>
+        </div>
+
+        <div class="search">
+          <input id="search" type="search" placeholder="Search classes…" />
+        </div>
+
+        <button id="openModalBtn" class="btn primary">+ Add Class</button>
+      </div>
+    </header>
+
+    <!-- Tabs -->
+    <nav class="tabs" role="tablist" aria-label="Views">
+      <button class="tab active" data-tab="dashboard" aria-selected="true">Dashboard</button>
+      <button class="tab" data-tab="schedule">Weekly Schedule</button>
+      <button class="tab" data-tab="suggestions">Suggestions</button>
+      <button class="tab" data-tab="notifications">Notifications</button>
+    </nav>
+
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="tab-panel active" role="tabpanel">
+      <div class="kpis">
+        <div class="kpi">
+          <div class="kpi-label">Total Credits</div>
+          <div id="kpiCredits" class="kpi-value">0</div>
+        </div>
+      </div>
+
+      <h2 class="section-title">Your Fall 2025 Semester at a Glance</h2>
+      <div id="classGrid" class="grid"></div>
+    </section>
+
+    <!-- WEEKLY SCHEDULE -->
+    <section id="schedule" class="tab-panel" role="tabpanel" aria-hidden="true">
+      <div class="schedule">
+        <div class="legend">
+          <span class="legend-item"><span class="chip chip-class"></span> Class</span>
+          <span class="legend-item"><span class="chip chip-conflict"></span> Conflict</span>
+          <span class="legend-item"><span class="chip chip-break"></span> Lunch (12–1)</span>
+        </div>
+        <div class="schedule-grid" id="scheduleGrid">
+          <div class="grid-header"></div>
+          <div class="grid-header">Mon</div>
+          <div class="grid-header">Tue</div>
+          <div class="grid-header">Wed</div>
+          <div class="grid-header">Thu</div>
+          <div class="grid-header">Fri</div>
+
+          <!-- Template for time rows -->
+          <template id="slot-template">
+            <div class="time"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+          </template>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- SUGGESTIONS -->
+    <section id="suggestions" class="tab-panel" role="tabpanel" aria-hidden="true">
+      <div id="suggestionList" class="list">
+        <!-- Populated by JS based on degree progress & availability -->
+      </div>
+    </section>
+
+    <!-- NOTIFICATIONS -->
+    <section id="notifications" class="tab-panel" role="tabpanel" aria-hidden="true">
+      <ul id="notifList" class="notif-list"></ul>
+    </section>
+
+    <!-- ADD/DROP MODAL -->
+    <dialog id="addDropModal">
+      <form method="dialog" class="modal">
+
+        <header class="modal-header">
+          <h3>Add / Drop Classes</h3>
+          <button class="btn icon" value="cancel" aria-label="Close">&times;</button>
+        </header>
+
+        <div class="modal-body">
+
+          <label class="field">
+            <span>Course code</span>
+            <input id="courseCode" type="text" placeholder="e.g., CSI 2300" />
+          </label>
+
+          <label class="field">
+            <span>Action</span>
+            <select id="courseAction">
+              <option value="add" selected>Add</option>
+              <option value="drop">Drop</option>
+            </select>
+          </label>
+
+          <p class="muted" id="courseHint"></p>
+        </div>
+
+        <footer class="modal-footer">
+          <button class="btn" value="cancel">Cancel</button>
+          <button id="submitAddDrop" class="btn primary" value="default">Save</button>
+        </footer>
+
+      </form>
+    </dialog>
+
+    <!-- Toasts -->
+    <div id="toasts" aria-live="polite" aria-atomic="true"></div>
+
+  </div>
+
+  <script src="scheduler-script.js"></script>
+</body>
+</html>
