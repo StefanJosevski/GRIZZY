@@ -1,158 +1,494 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Grizzy – Add Class Feature</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>Grizzy – Grade & GPA Calculator</title>
 
 <style>
-  :root {
+  :root{
     --ou-black:#000;
     --ou-gold:#FFC72C;
+    --bg:#fff;
+    --ink:#111;
+    --muted:#666;
     --card:#f7f7f8;
     --line:#e5e7eb;
   }
-  body {
-    font-family: Inter, Arial, sans-serif;
-    margin:0;
-    background:#fff;
-    color:#111;
-  }
-  header {
-    background:var(--ou-black);
-    color:#fff;
-    padding:16px 32px;
-  }
-  h1 {margin:0;font-weight:800;font-size:24px;}
-  .goldline {height:6px;background:var(--ou-gold);}
-  main {padding:24px 40px;}
-  .card {
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:12px;
-    padding:20px;
-    max-width:700px;
-    margin:auto;
-  }
-  label {display:block;margin-top:10px;font-weight:600;}
-  input {
-    width:100%;
-    padding:8px;
-    border-radius:6px;
-    border:1px solid #ccc;
-    margin-top:4px;
-  }
-  button {
-    background:var(--ou-gold);
-    color:#000;
-    border:none;
-    border-radius:8px;
-    padding:10px 14px;
-    margin-top:12px;
-    font-weight:700;
-    cursor:pointer;
-  }
-  table {
-    width:100%;
-    border-collapse:collapse;
-    margin-top:20px;
-    background:#fff;
-  }
-  th,td {
-    border:1px solid var(--line);
-    padding:8px;
-    text-align:left;
-    font-size:14px;
-  }
-  th {background:#fafafa;}
-  .result {
-    margin-top:20px;
-    font-weight:600;
+  body{font-family:Inter,Arial,sans-serif;margin:0;color:var(--ink);background:var(--bg)}
+  header{background:var(--ou-black);color:#fff;padding:16px 32px;display:flex;align-items:center;gap:16px}
+  header h1{margin:0;font-size:24px;font-weight:800;flex:1}
+  .header-actions{display:flex;gap:8px;flex-wrap:wrap}
+  .btn{background:var(--ou-gold);color:#000;border:none;border-radius:8px;padding:8px 14px;font-weight:700;cursor:pointer;transition:box-shadow .2s ease}
+  .btn:hover{box-shadow:0 0 10px var(--ou-gold)}
+  .btn.black{background:#000;color:#fff;border:1px solid #333}
+  .goldline{height:6px;background:var(--ou-gold)}
+  main{padding:24px 40px}
+  h1{margin:0 0 4px 0}
+  .subtext{color:var(--muted);font-size:14px;margin:0 0 16px 0}
+  .wrap{display:flex;gap:24px;flex-wrap:wrap}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;flex:1;min-width:320px;animation:fadeIn .35s ease}
+  .card h2{margin:0 0 8px 0}
+  label{display:block;font-size:13px;margin-top:10px;color:#333}
+  input,select{width:100%;padding:8px;border-radius:6px;border:1px solid #d1d5db;margin-top:4px;background:#fff;color:#111}
+  table{width:100%;border-collapse:collapse;margin-top:12px;background:#fff}
+  th,td{border:1px solid var(--line);padding:8px;font-size:13px;text-align:left}
+  th{background:#fafafa;color:#555}
+  tbody tr:hover{background:#f2f2f5}
+  .action-btn{background:#000;color:#fff;border:none;border-radius:6px;padding:6px 10px;font-weight:600;cursor:pointer}
+  .results{display:flex;gap:20px;flex-wrap:wrap;margin-top:12px}
+  .result-box{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 16px;flex:1;min-width:170px}
+  .result-box h3{font-size:12px;color:#555;margin:0}
+  .result-box p{font-size:20px;font-weight:800;margin:4px 0 0 0}
+  .bar{width:100%;height:6px;background:#eee;border-radius:3px;margin-top:8px;overflow:hidden}
+  #barFill{height:6px;background:var(--ou-gold);border-radius:3px;width:0;transition:width .3s ease}
+  .summary{margin-top:10px;color:#222;font-size:14px}
+  .quote{margin:10px 0 0 0;font-style:italic;color:#444}
+  .error{color:#b91c1c;font-size:12px;margin-top:8px}
+  .toast{display:none;margin-top:10px;background:rgba(255,199,44,.15);border:1px solid var(--ou-gold);color:#111;padding:8px 10px;border-radius:8px}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .row > div{flex:1;min-width:160px}
+  .badge{display:inline-block;background:#000;color:#FFC72C;border:1px solid #FFC72C;border-radius:999px;padding:6px 10px;margin:6px 6px 0 0;font-size:12px;font-weight:700}
+  canvas{width:100%;height:220px;background:#fff;border:1px solid var(--line);border-radius:10px}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+  /* Dark mode */
+  body.dark{background:#000;color:#f3f4f6}
+  body.dark .subtext{color:#9aa0aa}
+  body.dark .card{background:#111;border-color:#222}
+  body.dark input, body.dark select{background:#0f0f10;color:#f3f4f6;border-color:#333}
+  body.dark table{background:#0f0f10;color:#e5e7eb}
+  body.dark th{background:#111;color:#bbb;border-color:#222}
+  body.dark td{border-color:#222}
+  body.dark .result-box{background:#0f0f10;border-color:#222}
+  body.dark .bar{background:#222}
+  body.dark canvas{background:#0f0f10;border-color:#222}
+  @media print{
+    header,footer,#addBtn,#clearBtn,#darkBtn,#printBtn,#csvBtn,#goalRow{display:none}
+    body{font-family:serif;color:#000;background:#fff}
+    .card{page-break-inside:avoid}
   }
 </style>
 </head>
 
 <body>
-<header><h1>GRIZZY — Grade & GPA Calculator</h1></header>
+<header>
+  <h1>GRIZZY — Grade & GPA Calculator</h1>
+  <div class="header-actions">
+    <button id="printBtn" class="btn">Download as PDF</button>
+    <button id="csvBtn" class="btn">Export CSV</button>
+    <button id="darkBtn" class="btn black">Dark Mode</button>
+  </div>
+</header>
 <div class="goldline"></div>
 
 <main>
+  <h1>Grade & GPA Calculator</h1>
+  <p class="subtext" id="welcome">Welcome back, Golden Grizzly!</p>
+  <p class="subtext" id="dailyQuote"></p>
+
+  <!-- Semester controls -->
   <div class="card">
-    <h2>Add Class Names and Grades</h2>
-
-    <label for="className">Class Name</label>
-    <input id="className" type="text" placeholder="e.g. BIO 121">
-
-    <label for="grade">Grade (%)</label>
-    <input id="grade" type="number" placeholder="e.g. 90" min="0" max="100">
-
-    <label for="credits">Credits</label>
-    <input id="credits" type="number" placeholder="e.g. 3" min="0.5" step="0.5">
-
-    <button id="addBtn">Add Class</button>
-
-    <table>
-      <thead>
-        <tr><th>Class</th><th>Grade %</th><th>Credits</th><th>Letter</th></tr>
-      </thead>
-      <tbody id="tbody"></tbody>
-    </table>
-
-    <div class="result" id="results"></div>
+    <h2>Semester</h2>
+    <div class="row">
+      <div>
+        <label for="semesterSel">Select Semester</label>
+        <select id="semesterSel"></select>
+      </div>
+      <div>
+        <label for="newSem">Add New Semester</label>
+        <div class="row">
+          <div><input id="newSem" type="text" placeholder="e.g., Fall 2025"></div>
+          <div style="flex:0 0 auto"><button id="addSemBtn" class="btn">Add</button></div>
+        </div>
+      </div>
+      <div id="goalRow">
+        <label for="goal">Set GPA Goal</label>
+        <div class="row">
+          <div><input id="goal" type="number" step="0.1" placeholder="e.g., 3.5"></div>
+          <div style="flex:0 0 auto"><button id="saveGoalBtn" class="btn">Save Goal</button></div>
+        </div>
+        <div id="goalMsg" class="subtext" style="margin-top:6px;"></div>
+      </div>
+    </div>
   </div>
+
+  <div class="wrap">
+    <!-- Add Class -->
+    <div class="card">
+      <h2>Add Class</h2>
+      <label for="className">Class Name</label>
+      <input id="className" type="text" placeholder="Any course (e.g., BIO 121, HIS 201)">
+      <label for="grade">Grade (%)</label>
+      <input id="grade" type="number" placeholder="e.g., 89.5" min="0" max="100">
+      <label for="credits">Credits</label>
+      <input id="credits" type="number" placeholder="e.g., 3" min="0.5" step="0.5">
+      <div class="row" style="margin-top:10px;">
+        <button id="addBtn" class="btn">Add Class</button>
+        <button id="clearBtn" class="btn black">Clear All</button>
+      </div>
+      <div id="err" class="error"></div>
+      <div id="toast" class="toast">All classes removed — start fresh!</div>
+    </div>
+
+    <!-- Table -->
+    <div class="card" style="flex:2">
+      <h2>Classes</h2>
+      <table>
+        <thead>
+          <tr><th>Class</th><th>Grade %</th><th>Credits</th><th>Letter</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Results & analytics -->
+  <div class="card" style="margin-top:24px;">
+    <h2>Results</h2>
+    <div class="results">
+      <div class="result-box">
+        <h3>Average (%)</h3>
+        <p id="avg">0%</p>
+        <div class="bar"><div id="barFill"></div></div>
+      </div>
+      <div class="result-box">
+        <h3>GPA</h3>
+        <p id="gpa">0.00</p>
+      </div>
+      <div class="result-box">
+        <h3>Total Credits</h3>
+        <p id="total">0</p>
+      </div>
+    </div>
+    <div id="summary" class="summary">No classes yet.</div>
+    <div id="achievements" class="summary"></div>
+    <div id="insight" class="summary"></div>
+    <div id="quote" class="quote"></div>
+
+    <h3 style="margin-top:16px;">GPA Performance</h3>
+    <canvas id="gpaChart" width="900" height="220"></canvas>
+  </div>
+
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <script>
-  const tbody = document.getElementById("tbody");
-  const results = document.getElementById("results");
-  let classes = [];
+  // ======= State (per semester) =======
+  const DEFAULT_SEMS = ["Fall 2024","Winter 2025","Fall 2025"];
+  let semesters = {}; // { name: { classes:[], gpaHistory:[], goal: number|null, confettiDone:boolean } }
+  let currentSem = null;
 
-  function gradeToLetter(g){
-    return g>=93?"A":g>=90?"A-":g>=87?"B+":g>=83?"B":g>=80?"B-":
-           g>=77?"C+":g>=73?"C":g>=70?"C-":g>=67?"D+":g>=65?"D":"F";
+  // ======= DOM =======
+  const tbody = document.getElementById('tbody');
+  const avgEl = document.getElementById('avg');
+  const gpaEl = document.getElementById('gpa');
+  const totalEl = document.getElementById('total');
+  const barFill = document.getElementById('barFill');
+  const summary = document.getElementById('summary');
+  const achievementsEl = document.getElementById('achievements');
+  const insightEl = document.getElementById('insight');
+  const errEl = document.getElementById('err');
+  const toast = document.getElementById('toast');
+  const dailyQuote = document.getElementById('dailyQuote');
+  const goalInput = document.getElementById('goal');
+  const goalMsg = document.getElementById('goalMsg');
+  const semSel = document.getElementById('semesterSel');
+  const newSem = document.getElementById('newSem');
+
+  // Chart
+  const chartCanvas = document.getElementById('gpaChart');
+  const ctx = chartCanvas.getContext('2d');
+
+  // ======= Utils =======
+  const gradeToGPA = g => g>=93?4.0:g>=90?3.7:g>=87?3.3:g>=83?3.0:g>=80?2.7:g>=77?2.3:g>=73?2.0:g>=70?1.7:g>=67?1.3:g>=65?1.0:0.0;
+  const gradeToLetter = g => g>=93?"A":g>=90?"A-":g>=87?"B+":g>=83?"B":g>=80?"B-":g>=77?"C+":g>=73?"C":g>=70?"C-":g>=67?"D+":g>=65?"D":"F";
+
+  function saveAll(){
+    localStorage.setItem('grizzySemesters', JSON.stringify(semesters));
+    localStorage.setItem('grizzyCurrentSem', currentSem || '');
+    localStorage.setItem('grizzyDark', document.body.classList.contains('dark')?'1':'0');
   }
-  function gradeToGPA(g){
-    return g>=93?4:g>=90?3.7:g>=87?3.3:g>=83?3:g>=80?2.7:
-           g>=77?2.3:g>=73?2:g>=70?1.7:g>=67?1.3:g>=65?1:0;
+  function loadAll(){
+    try{
+      const raw = JSON.parse(localStorage.getItem('grizzySemesters') || '{}');
+      if (raw && typeof raw==='object') semesters = raw;
+    }catch(_){}
+    // seed defaults if empty
+    if (Object.keys(semesters).length===0){
+      DEFAULT_SEMS.forEach(n=>semesters[n]={classes:[],gpaHistory:[],goal:null,confettiDone:false});
+    }
+    currentSem = localStorage.getItem('grizzyCurrentSem') || Object.keys(semesters)[0];
+    if (!semesters[currentSem]) currentSem = Object.keys(semesters)[0];
+    if (localStorage.getItem('grizzyDark')==='1') document.body.classList.add('dark');
+  }
+
+  // ======= Semester UI =======
+  function refreshSemesterSelect(){
+    semSel.innerHTML = '';
+    Object.keys(semesters).forEach(name=>{
+      const opt = document.createElement('option');
+      opt.value = name; opt.textContent = name;
+      if (name===currentSem) opt.selected = true;
+      semSel.appendChild(opt);
+    });
+  }
+  function switchSemester(name){
+    if (!semesters[name]) return;
+    currentSem = name;
+    goalInput.value = semesters[name].goal ?? '';
+    renderClasses();
+    updateAll();
+    saveAll();
+  }
+  function addSemester(){
+    const name = newSem.value.trim();
+    if(!name) return;
+    if(semesters[name]){ alert('Semester already exists.'); return; }
+    semesters[name] = { classes:[], gpaHistory:[], goal:null, confettiDone:false };
+    newSem.value='';
+    refreshSemesterSelect();
+    switchSemester(name);
+  }
+
+  // ======= Classes table =======
+  function renderClasses(){
+    tbody.innerHTML = '';
+    (semesters[currentSem].classes||[]).forEach((c,i)=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML = `
+        <td>${c.name}</td>
+        <td>${c.grade}</td>
+        <td>${c.credits}</td>
+        <td>${c.letter}</td>
+        <td><button class="action-btn" onclick="removeClass(${i})">Remove</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
   }
 
   function addClass(){
-    const name=document.getElementById("className").value.trim();
-    const grade=Number(document.getElementById("grade").value);
-    const credits=Number(document.getElementById("credits").value);
-    if(!name || isNaN(grade) || isNaN(credits)) return alert("Please fill all fields.");
-
-    const letter=gradeToLetter(grade);
-    classes.push({name,grade,credits,letter});
-    render();
-    document.getElementById("className").value="";
-    document.getElementById("grade").value="";
-    document.getElementById("credits").value="";
+    errEl.textContent='';
+    const name = document.getElementById('className').value.trim();
+    const grade = Number(document.getElementById('grade').value);
+    const credits = Number(document.getElementById('credits').value);
+    if(!name){ errEl.textContent='Enter a class name.'; return; }
+    if(!Number.isFinite(grade) || grade<0 || grade>100){ errEl.textContent='Grade must be 0–100.'; return; }
+    if(!Number.isFinite(credits) || credits<=0){ errEl.textContent='Credits must be positive.'; return; }
+    const letter = gradeToLetter(grade);
+    semesters[currentSem].classes.push({ name, grade: Number(grade.toFixed(1)), credits, letter });
+    ['className','grade','credits'].forEach(id=>document.getElementById(id).value='');
+    renderClasses();
+    updateAll(true);
+    saveAll();
   }
 
-  function render(){
-    tbody.innerHTML="";
-    let totalPoints=0, totalCredits=0, weightedGrades=0;
-    classes.forEach(c=>{
-      const tr=document.createElement("tr");
-      tr.innerHTML=`<td>${c.name}</td><td>${c.grade}</td><td>${c.credits}</td><td>${c.letter}</td>`;
-      tbody.appendChild(tr);
-      totalPoints += gradeToGPA(c.grade)*c.credits;
-      weightedGrades += c.grade*c.credits;
-      totalCredits += c.credits;
+  function removeClass(i){
+    semesters[currentSem].classes.splice(i,1);
+    renderClasses();
+    updateAll();
+    if(semesters[currentSem].classes.length===0){ showToast(); }
+    saveAll();
+  }
+
+  function clearAll(){
+    semesters[currentSem].classes = [];
+    semesters[currentSem].gpaHistory = [];
+    semesters[currentSem].confettiDone = false;
+    renderClasses();
+    drawChart([]);
+    updateAll();
+    showToast();
+    saveAll();
+  }
+
+  function showToast(){
+    toast.style.display='block';
+    setTimeout(()=>toast.style.display='none',2000);
+  }
+
+  // ======= Results, Achievements, Insights =======
+  function computeAgg(){
+    const list = semesters[currentSem].classes;
+    let totC=0, totPoints=0, weightedPct=0;
+    list.forEach(c=>{ totC+=c.credits; totPoints+=gradeToGPA(c.grade)*c.credits; weightedPct+=c.grade*c.credits; });
+    const avg = totC ? (weightedPct/totC) : 0;
+    const gpa = totC ? (totPoints/totC) : 0;
+    return { avg, gpa, credits: totC };
+  }
+
+  function updateSummaryUI({avg,gpa,credits}){
+    avgEl.textContent = credits ? avg.toFixed(1) + '%' : '0%';
+    gpaEl.textContent = gpa.toFixed(2);
+    totalEl.textContent = credits ? credits.toFixed(1).replace(/\.0$/,'') : '0';
+    barFill.style.width = Math.max(0, Math.min(100, avg)) + '%';
+    summary.textContent = credits
+      ? `You’re averaging a ${gradeToLetter(avg)} (${gpa.toFixed(2)} GPA) across ${totalEl.textContent} credits.`
+      : 'No classes yet.';
+  }
+
+  function updateAchievements({gpa,credits}){
+    const list = semesters[currentSem].classes;
+    const allA = list.length>0 && list.every(c => ['A','A-'].includes(c.letter));
+    const earn = [];
+    if (gpa >= 3.8) earn.push('🏅 Dean’s List');
+    if (credits >= 10) earn.push('📚 Hard Worker');
+    if (allA) earn.push('💯 Perfect Grizzly');
+    achievementsEl.innerHTML = earn.map(b=>`<span class="badge">${b}</span>`).join('') || '';
+  }
+
+  function updateInsight({avg,gpa,credits}){
+    const list = semesters[currentSem].classes;
+    if (list.length===0){ insightEl.textContent=''; return; }
+    // find lowest grade, simulate +5 (cap 100) and recompute
+    let minIdx=-1, minVal=101;
+    list.forEach((c,i)=>{ if(c.grade<minVal){minVal=c.grade;minIdx=i;} });
+    if (minIdx===-1){ insightEl.textContent=''; return; }
+    const test = JSON.parse(JSON.stringify(list));
+    test[minIdx].grade = Math.min(100, test[minIdx].grade + 5);
+    let totC=0, totP=0;
+    test.forEach(c=>{ totC+=c.credits; totP+=gradeToGPA(c.grade)*c.credits; });
+    const newGPA = totC ? (totP/totC) : gpa;
+    insightEl.textContent = `If you raise your lowest class by 5%, your GPA could reach ${newGPA.toFixed(2)}.`;
+  }
+
+  function updateGoalMessage(gpa){
+    const goal = Number(semesters[currentSem].goal);
+    if (!goal){ goalMsg.textContent=''; return; }
+    goalMsg.textContent = gpa >= goal
+      ? `🔥 Goal met! Your GPA (${gpa.toFixed(2)}) is ≥ ${goal.toFixed(2)}.`
+      : `Goal: ${goal.toFixed(2)} — you’re ${ (goal - gpa).toFixed(2) } away.`;
+  }
+
+  // ======= Chart =======
+  function drawChart(series){
+    const w = chartCanvas.width, h = chartCanvas.height;
+    ctx.clearRect(0,0,w,h);
+    // axes (light)
+    ctx.strokeStyle = '#e5e7eb';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(40,10); ctx.lineTo(40,h-30); ctx.lineTo(w-10,h-30); ctx.stroke();
+
+    if (series.length===0) return;
+    // map gpa (0..4) to y
+    const maxX = Math.max(1, series.length-1);
+    const xStep = (w-60)/Math.max(1,maxX);
+    const yFor = v => (h-30) - (v/4)* (h-50);
+
+    // line
+    ctx.strokeStyle = '#FFC72C';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    series.forEach((v,i)=>{
+      const x = 40 + i*xStep;
+      const y = yFor(v);
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
     });
-    if(totalCredits>0){
-      const avg = weightedGrades/totalCredits;
-      const gpa = totalPoints/totalCredits;
-      results.textContent = `Average: ${avg.toFixed(1)}% | GPA: ${gpa.toFixed(2)}`;
-    } else {
-      results.textContent = "No classes yet.";
+    ctx.stroke();
+
+    // dots
+    ctx.fillStyle='#000';
+    series.forEach((v,i)=>{
+      const x = 40 + i*xStep, y=yFor(v);
+      ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2); ctx.fill();
+    });
+
+    // y labels
+    ctx.fillStyle = '#666'; ctx.font='12px Arial';
+    for(let t=0;t<=4;t+=1){
+      const y = yFor(t);
+      ctx.fillText(t.toFixed(0), 10, y+4);
     }
   }
 
-  document.getElementById("addBtn").onclick = addClass;
+  // ======= Update cycle =======
+  function updateAll(addToHistory=false){
+    const agg = computeAgg();
+    updateSummaryUI(agg);
+    updateAchievements(agg);
+    updateInsight(agg);
+    updateGoalMessage(agg.gpa);
+
+    // quotes by GPA
+    const q =
+      agg.gpa>=3.7?"Elite focus. Keep the streak: consistency beats cramming."
+      :agg.gpa>=3.0?"Solid momentum. Target one weak spot and you’ll level up."
+      :agg.gpa>=2.0?"You’re in the fight. One better habit this week changes the curve."
+      :agg.gpa>0?"Start small, win daily: show up, ask questions, use office hours."
+      :"Add a class to get started — tiny steps, big gains.";
+    document.getElementById('quote').textContent = q;
+
+    // confetti once per semester
+    if (agg.gpa>=3.7 && !semesters[currentSem].confettiDone){
+      confetti({ spread: 60, particleCount: 120, origin: { y: 0.8 } });
+      semesters[currentSem].confettiDone = true;
+    }
+
+    // chart history
+    if (addToHistory && agg.credits>0){
+      semesters[currentSem].gpaHistory.push(Number(agg.gpa.toFixed(3)));
+    }
+    drawChart(semesters[currentSem].gpaHistory);
+
+    saveAll();
+  }
+
+  // ======= CSV Export =======
+  function downloadCSV(){
+    const rows = [["Class","Grade %","Credits","Letter"]];
+    (semesters[currentSem].classes||[]).forEach(c=>rows.push([c.name,c.grade,c.credits,c.letter]));
+    const csv = rows.map(r=>r.join(",")).join("\n");
+    const blob = new Blob([csv], {type:"text/csv"});
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${currentSem.replace(/\s+/g,'_')}_grades.csv`;
+    link.click();
+  }
+
+  // ======= Events =======
+  document.getElementById('addBtn').onclick = addClass;
+  document.getElementById('clearBtn').onclick = clearAll;
+  document.getElementById('printBtn').onclick = ()=>window.print();
+  document.getElementById('csvBtn').onclick = downloadCSV;
+  document.getElementById('darkBtn').onclick = ()=>{ document.body.classList.toggle('dark'); saveAll(); };
+
+  document.getElementById('saveGoalBtn').onclick = ()=>{
+    const v = goalInput.value.trim();
+    semesters[currentSem].goal = v ? Number(v) : null;
+    updateAll();
+  };
+
+  document.getElementById('addSemBtn').onclick = addSemester;
+  semSel.onchange = e => switchSemester(e.target.value);
+
+  document.addEventListener('keydown', e=>{
+    if(e.key==='Enter') addClass();
+    if(e.ctrlKey && e.shiftKey && e.key==='C') clearAll();
+  });
+
+  // ======= Init =======
+  // Auto dark mode detection
+  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){
+    document.body.classList.add('dark');
+  }
+
+  // Quotes
+  const dailyQuotes=[
+    "Discipline beats motivation.",
+    "Consistency builds greatness.",
+    "One more study session = one more win.",
+    "Grades are built one page at a time.",
+    "Tiny habits make giant results."
+  ];
+  dailyQuote.textContent = dailyQuotes[Math.floor(Math.random()*dailyQuotes.length)];
+
+  // Load semesters + set up UI
+  loadAll();
+  refreshSemesterSelect();
+  switchSemester(currentSem);
+
+  // Expose for inline handlers
+  window.removeClass = removeClass;
 </script>
 </body>
 </html>
-
- 
