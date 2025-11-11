@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Class Discussions</title>
+    <link rel="stylesheet" href="style-forum.css" />
+</head>
+<body>
+<header class="header">
+    <h1>Class Discussion Board</h1>
+    <button id="newDiscussionBtn" class="btn primary">+ New Class</button>
+</header>
+
+<div class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <h2>Classes</h2>
+        <ul id="classList" class="class-list"></ul>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main">
+        <div class="toolbar">
+            <h2 id="currentClassTitle">All Classes</h2>
+            <button id="addCommentBtn" class="btn secondary">+ Add Comment</button>
+        </div>
+        <div id="discussions"></div>
+    </main>
+</div>
+
+<!-- Create Class Modal -->
+<div id="discussionModal" class="modal">
+    <div class="modal-content">
+        <h3>Create Class</h3>
+        <input id="discussionTitle" placeholder="Class Name" />
+        <input id="discussionCode" placeholder="Class Code" />
+        <div class="modal-actions">
+            <button id="createDiscussionBtn" class="btn primary">Create</button>
+            <button class="btn closeModal">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Comment Modal -->
+<div id="commentModal" class="modal">
+    <div class="modal-content">
+        <h3>Add Comment</h3>
+        <select id="commentClassSelect"></select>
+        <input id="commentAuthor" placeholder="Your name" />
+        <textarea id="commentContent" placeholder="Write your comment..."></textarea>
+        <div class="modal-actions">
+            <button id="submitCommentBtn" class="btn primary">Post</button>
+            <button class="btn closeModal">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Reply Modal -->
+<div id="replyModal" class="modal">
+    <div class="modal-content">
+        <h3>Add Reply</h3>
+        <input id="replyAuthor" placeholder="Your name" />
+        <textarea id="replyContent" placeholder="Write your reply..."></textarea>
+        <div class="modal-actions">
+            <button id="submitReplyBtn" class="btn primary">Post</button>
+            <button class="btn closeModal">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script src="script-forum.js"></script>
+</body>
+</html>
+
+
