@@ -8,6 +8,8 @@ document.querySelectorAll('.feature-card').forEach(card => {
             window.location.href = "Study_Buddy.html";
         } else if (path === "/schedule-assister") {
             window.location.href = "scheduler.html";
+        } else if (path === "/help-forum") {
+            window.location.href = "forum.html";
         }
     });
 });
