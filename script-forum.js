@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:3000/api";
+const API_BASE = "https://grizzybackend.onrender.com/api";
 
 const discussionsDiv = document.getElementById("discussions");
 const discussionModal = document.getElementById("discussionModal");
@@ -128,15 +128,14 @@ document.getElementById("newDiscussionBtn").onclick = () => {
 
 document.getElementById("createDiscussionBtn").onclick = async () => {
     const discussionName = document.getElementById("discussionTitle").value.trim();
-    const discussionCode = document.getElementById("discussionCode").value.trim();
 
-    if (!discussionName || !discussionCode) return alert("Please fill all fields");
+    if (!discussionName) return alert("Please fill all fields");
 
     try {
         await fetch(`${API_BASE}/classDiscussions`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: discussionName, class_code: discussionCode })
+            body: JSON.stringify({ name: discussionName })
         });
         closeModals();
         await fetchDiscussions();

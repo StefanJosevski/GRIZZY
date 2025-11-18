@@ -35,7 +35,7 @@
   th,td{border:1px solid var(--line);padding:8px;font-size:13px;text-align:left}
   th{background:#fafafa;color:#555}
   tbody tr:hover{background:#f2f2f5}
-  .action-btn{background:#000;color:#fff;border:none;border-radius:6px;padding:6px 10px;font-weight:600;cursor:pointer}
+  .action-btn{background:#000;color:#fff;border:none;border-radius:6px;padding:4px 8px;font-weight:600;cursor:pointer;font-size:11px;margin-right:4px}
   .results{display:flex;gap:20px;flex-wrap:wrap;margin-top:12px}
   .result-box{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 16px;flex:1;min-width:170px}
   .result-box h3{font-size:12px;color:#555;margin:0}
@@ -64,7 +64,7 @@
   body.dark .bar{background:#222}
   body.dark canvas{background:#0f0f10;border-color:#222}
   @media print{
-    header,footer,#addBtn,#clearBtn,#darkBtn,#printBtn,#csvBtn,#goalRow{display:none}
+    header,#addBtn,#clearBtn,#darkBtn,#printBtn,#csvBtn,#goalRow,#forecastBtn{display:none}
     body{font-family:serif;color:#000;background:#fff}
     .card{page-break-inside:avoid}
   }
@@ -119,10 +119,22 @@
       <h2>Add Class</h2>
       <label for="className">Class Name</label>
       <input id="className" type="text" placeholder="Any course (e.g., BIO 121, HIS 201)">
+
       <label for="grade">Grade (%)</label>
       <input id="grade" type="number" placeholder="e.g., 89.5" min="0" max="100">
+
       <label for="credits">Credits</label>
       <input id="credits" type="number" placeholder="e.g., 3" min="0.5" step="0.5">
+
+      <label for="category">Category</label>
+      <select id="category">
+        <option value="STEM">STEM</option>
+        <option value="Humanities">Humanities</option>
+        <option value="Business">Business</option>
+        <option value="Elective">Elective</option>
+        <option value="Other" selected>Other</option>
+      </select>
+
       <div class="row" style="margin-top:10px;">
         <button id="addBtn" class="btn">Add Class</button>
         <button id="clearBtn" class="btn black">Clear All</button>
@@ -136,7 +148,7 @@
       <h2>Classes</h2>
       <table>
         <thead>
-          <tr><th>Class</th><th>Grade %</th><th>Credits</th><th>Letter</th><th>Actions</th></tr>
+          <tr><th>Class</th><th>Grade %</th><th>Credits</th><th>Letter</th><th>Category</th><th>Actions</th></tr>
         </thead>
         <tbody id="tbody"></tbody>
       </table>
@@ -163,21 +175,45 @@
     </div>
     <div id="summary" class="summary">No classes yet.</div>
     <div id="achievements" class="summary"></div>
+    <div id="change" class="summary"></div>
     <div id="insight" class="summary"></div>
     <div id="quote" class="quote"></div>
 
+    <!-- GPA forecast -->
+    <h3 style="margin-top:16px;">GPA Forecast – What do I need next?</h3>
+    <div class="row">
+      <div>
+        <label for="forecastTarget">Target GPA</label>
+        <input id="forecastTarget" type="number" step="0.01" placeholder="e.g., 3.5">
+      </div>
+      <div>
+        <label for="forecastCredits">Next class credits</label>
+        <input id="forecastCredits" type="number" step="0.5" placeholder="e.g., 3">
+      </div>
+      <div style="flex:0 0 auto;margin-top:22px;">
+        <button id="forecastBtn" class="btn">Calculate Needed Grade</button>
+      </div>
+    </div>
+    <div id="forecastMsg" class="subtext" style="margin-top:6px;"></div>
+
     <h3 style="margin-top:16px;">GPA Performance</h3>
     <canvas id="gpaChart" width="900" height="220"></canvas>
+
+    <h3 style="margin-top:16px;">Category Breakdown</h3>
+    <canvas id="categoryChart" width="900" height="220"></canvas>
   </div>
 
 </main>
 
+<!-- Chart.js + confetti -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <script>
   // ======= State (per semester) =======
   const DEFAULT_SEMS = ["Fall 2024","Winter 2025","Fall 2025"];
   let semesters = {}; // { name: { classes:[], gpaHistory:[], goal: number|null, confettiDone:boolean } }
   let currentSem = null;
+  let editingIndex = null; // for edit mode
 
   // ======= DOM =======
   const tbody = document.getElementById('tbody');
@@ -188,6 +224,7 @@
   const summary = document.getElementById('summary');
   const achievementsEl = document.getElementById('achievements');
   const insightEl = document.getElementById('insight');
+  const changeEl = document.getElementById('change');
   const errEl = document.getElementById('err');
   const toast = document.getElementById('toast');
   const dailyQuote = document.getElementById('dailyQuote');
@@ -195,14 +232,34 @@
   const goalMsg = document.getElementById('goalMsg');
   const semSel = document.getElementById('semesterSel');
   const newSem = document.getElementById('newSem');
+  const forecastTarget = document.getElementById('forecastTarget');
+  const forecastCredits = document.getElementById('forecastCredits');
+  const forecastMsg = document.getElementById('forecastMsg');
 
-  // Chart
-  const chartCanvas = document.getElementById('gpaChart');
-  const ctx = chartCanvas.getContext('2d');
+  // Charts
+  const gpaCtx = document.getElementById('gpaChart').getContext('2d');
+  const catCtx = document.getElementById('categoryChart').getContext('2d');
+  let gpaChartInstance = null;
+  let catChartInstance = null;
 
   // ======= Utils =======
   const gradeToGPA = g => g>=93?4.0:g>=90?3.7:g>=87?3.3:g>=83?3.0:g>=80?2.7:g>=77?2.3:g>=73?2.0:g>=70?1.7:g>=67?1.3:g>=65?1.0:0.0;
   const gradeToLetter = g => g>=93?"A":g>=90?"A-":g>=87?"B+":g>=83?"B":g>=80?"B-":g>=77?"C+":g>=73?"C":g>=70?"C-":g>=67?"D+":g>=65?"D":"F";
+
+  // rough reverse mapping GPA -> % (just for forecast message)
+  function gpaToPercent(gg){
+    if(gg>=4) return 95;
+    if(gg>=3.7) return 92;
+    if(gg>=3.3) return 88;
+    if(gg>=3.0) return 85;
+    if(gg>=2.7) return 82;
+    if(gg>=2.3) return 78;
+    if(gg>=2.0) return 75;
+    if(gg>=1.7) return 72;
+    if(gg>=1.3) return 68;
+    if(gg>=1.0) return 65;
+    return 60;
+  }
 
   function saveAll(){
     localStorage.setItem('grizzySemesters', JSON.stringify(semesters));
@@ -214,7 +271,6 @@
       const raw = JSON.parse(localStorage.getItem('grizzySemesters') || '{}');
       if (raw && typeof raw==='object') semesters = raw;
     }catch(_){}
-    // seed defaults if empty
     if (Object.keys(semesters).length===0){
       DEFAULT_SEMS.forEach(n=>semesters[n]={classes:[],gpaHistory:[],goal:null,confettiDone:false});
     }
@@ -237,6 +293,7 @@
     if (!semesters[name]) return;
     currentSem = name;
     goalInput.value = semesters[name].goal ?? '';
+    editingIndex = null;
     renderClasses();
     updateAll();
     saveAll();
@@ -245,7 +302,7 @@
     const name = newSem.value.trim();
     if(!name) return;
     if(semesters[name]){ alert('Semester already exists.'); return; }
-    semesters[name] = { classes:[], gpaHistory:[], goal:null, confettiDone:false };
+    semesters[name] = { classes:[],gpaHistory:[],goal:null,confettiDone:false };
     newSem.value='';
     refreshSemesterSelect();
     switchSemester(name);
@@ -261,26 +318,55 @@
         <td>${c.grade}</td>
         <td>${c.credits}</td>
         <td>${c.letter}</td>
-        <td><button class="action-btn" onclick="removeClass(${i})">Remove</button></td>
+        <td>${c.category}</td>
+        <td>
+          <button class="action-btn" onclick="startEdit(${i})">Edit</button>
+          <button class="action-btn" onclick="removeClass(${i})">Remove</button>
+        </td>
       `;
       tbody.appendChild(tr);
     });
   }
 
-  function addClass(){
+  function addOrUpdateClass(){
     errEl.textContent='';
     const name = document.getElementById('className').value.trim();
     const grade = Number(document.getElementById('grade').value);
     const credits = Number(document.getElementById('credits').value);
+    const category = document.getElementById('category').value || 'Other';
+
     if(!name){ errEl.textContent='Enter a class name.'; return; }
     if(!Number.isFinite(grade) || grade<0 || grade>100){ errEl.textContent='Grade must be 0–100.'; return; }
     if(!Number.isFinite(credits) || credits<=0){ errEl.textContent='Credits must be positive.'; return; }
+
     const letter = gradeToLetter(grade);
-    semesters[currentSem].classes.push({ name, grade: Number(grade.toFixed(1)), credits, letter });
+    const obj = { name, grade: Number(grade.toFixed(1)), credits, letter, category };
+
+    if (editingIndex !== null){
+      semesters[currentSem].classes[editingIndex] = obj;
+      editingIndex = null;
+      document.getElementById('addBtn').textContent = 'Add Class';
+    }else{
+      semesters[currentSem].classes.push(obj);
+    }
+
     ['className','grade','credits'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('category').value='Other';
+
     renderClasses();
     updateAll(true);
     saveAll();
+  }
+
+  function startEdit(i){
+    const c = semesters[currentSem].classes[i];
+    document.getElementById('className').value = c.name;
+    document.getElementById('grade').value = c.grade;
+    document.getElementById('credits').value = c.credits;
+    document.getElementById('category').value = c.category || 'Other';
+    editingIndex = i;
+    errEl.textContent = 'Editing existing class. Save to apply changes.';
+    document.getElementById('addBtn').textContent = 'Save Changes';
   }
 
   function removeClass(i){
@@ -295,9 +381,11 @@
     semesters[currentSem].classes = [];
     semesters[currentSem].gpaHistory = [];
     semesters[currentSem].confettiDone = false;
+    editingIndex = null;
+    document.getElementById('addBtn').textContent = 'Add Class';
     renderClasses();
-    drawChart([]);
     updateAll();
+    drawCharts([], {labels:[],data:[]});
     showToast();
     saveAll();
   }
@@ -307,7 +395,7 @@
     setTimeout(()=>toast.style.display='none',2000);
   }
 
-  // ======= Results, Achievements, Insights =======
+  // ======= Aggregation =======
   function computeAgg(){
     const list = semesters[currentSem].classes;
     let totC=0, totPoints=0, weightedPct=0;
@@ -317,6 +405,25 @@
     return { avg, gpa, credits: totC };
   }
 
+  function computeCategoryStats(){
+    const list = semesters[currentSem].classes;
+    const totals={}, credits={};
+    list.forEach(c=>{
+      const cat = c.category || 'Other';
+      totals[cat] = (totals[cat]||0) + c.grade*c.credits;
+      credits[cat] = (credits[cat]||0) + c.credits;
+    });
+    const labels=[], data=[];
+    Object.keys(totals).forEach(cat=>{
+      if(credits[cat]>0){
+        labels.push(cat);
+        data.push(totals[cat]/credits[cat]);
+      }
+    });
+    return {labels,data};
+  }
+
+  // ======= UI updates =======
   function updateSummaryUI({avg,gpa,credits}){
     avgEl.textContent = credits ? avg.toFixed(1) + '%' : '0%';
     gpaEl.textContent = gpa.toFixed(2);
@@ -340,7 +447,6 @@
   function updateInsight({avg,gpa,credits}){
     const list = semesters[currentSem].classes;
     if (list.length===0){ insightEl.textContent=''; return; }
-    // find lowest grade, simulate +5 (cap 100) and recompute
     let minIdx=-1, minVal=101;
     list.forEach((c,i)=>{ if(c.grade<minVal){minVal=c.grade;minIdx=i;} });
     if (minIdx===-1){ insightEl.textContent=''; return; }
@@ -357,48 +463,68 @@
     if (!goal){ goalMsg.textContent=''; return; }
     goalMsg.textContent = gpa >= goal
       ? `🔥 Goal met! Your GPA (${gpa.toFixed(2)}) is ≥ ${goal.toFixed(2)}.`
-      : `Goal: ${goal.toFixed(2)} — you’re ${ (goal - gpa).toFixed(2) } away.`;
+      : `Goal: ${goal.toFixed(2)} — you’re ${(goal - gpa).toFixed(2)} away.`;
   }
 
-  // ======= Chart =======
-  function drawChart(series){
-    const w = chartCanvas.width, h = chartCanvas.height;
-    ctx.clearRect(0,0,w,h);
-    // axes (light)
-    ctx.strokeStyle = '#e5e7eb';
-    ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(40,10); ctx.lineTo(40,h-30); ctx.lineTo(w-10,h-30); ctx.stroke();
-
-    if (series.length===0) return;
-    // map gpa (0..4) to y
-    const maxX = Math.max(1, series.length-1);
-    const xStep = (w-60)/Math.max(1,maxX);
-    const yFor = v => (h-30) - (v/4)* (h-50);
-
-    // line
-    ctx.strokeStyle = '#FFC72C';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    series.forEach((v,i)=>{
-      const x = 40 + i*xStep;
-      const y = yFor(v);
-      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-    });
-    ctx.stroke();
-
-    // dots
-    ctx.fillStyle='#000';
-    series.forEach((v,i)=>{
-      const x = 40 + i*xStep, y=yFor(v);
-      ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2); ctx.fill();
-    });
-
-    // y labels
-    ctx.fillStyle = '#666'; ctx.font='12px Arial';
-    for(let t=0;t<=4;t+=1){
-      const y = yFor(t);
-      ctx.fillText(t.toFixed(0), 10, y+4);
+  function updateChangeSinceLast(){
+    const hist = semesters[currentSem].gpaHistory;
+    if(hist.length>=2){
+      const delta = hist[hist.length-1] - hist[hist.length-2];
+      const sign = delta>0?'+':'';
+      if(delta!==0){
+        changeEl.textContent = `GPA change since last update: ${sign}${delta.toFixed(2)}.`;
+      }else{
+        changeEl.textContent = 'GPA unchanged since last update.';
+      }
+    }else{
+      changeEl.textContent = '';
     }
+  }
+
+  // ======= Charts (Chart.js) =======
+  function drawCharts(history, catStats){
+    // GPA history line
+    if(gpaChartInstance) gpaChartInstance.destroy();
+    gpaChartInstance = new Chart(gpaCtx, {
+      type:'line',
+      data:{
+        labels: history.map((_,i)=>`Update ${i+1}`),
+        datasets:[{
+          label:'GPA',
+          data: history,
+          borderColor:'#FFC72C',
+          backgroundColor:'rgba(255,199,44,0.2)',
+          tension:0.2,
+          pointRadius:3
+        }]
+      },
+      options:{
+        scales:{
+          y:{min:0,max:4,ticks:{stepSize:1}}
+        }
+      }
+    });
+
+    // Category bar chart
+    if(catChartInstance) catChartInstance.destroy();
+    catChartInstance = new Chart(catCtx, {
+      type:'bar',
+      data:{
+        labels:catStats.labels,
+        datasets:[{
+          label:'Avg Grade %',
+          data:catStats.data,
+          backgroundColor:'rgba(255,199,44,0.6)',
+          borderColor:'#FFC72C',
+          borderWidth:1
+        }]
+      },
+      options:{
+        scales:{
+          y:{min:0,max:100,ticks:{stepSize:20}}
+        }
+      }
+    });
   }
 
   // ======= Update cycle =======
@@ -409,34 +535,32 @@
     updateInsight(agg);
     updateGoalMessage(agg.gpa);
 
-    // quotes by GPA
+    // GPA-based study tips / quotes
     const q =
-      agg.gpa>=3.7?"Elite focus. Keep the streak: consistency beats cramming."
-      :agg.gpa>=3.0?"Solid momentum. Target one weak spot and you’ll level up."
-      :agg.gpa>=2.0?"You’re in the fight. One better habit this week changes the curve."
-      :agg.gpa>0?"Start small, win daily: show up, ask questions, use office hours."
+      agg.gpa>=3.7?"Elite focus. Keep the streak: use review days, not cram nights."
+      :agg.gpa>=3.0?"Solid momentum. Target one weak class this week with office hours."
+      :agg.gpa>=2.0?"You’re in the fight. Try 25-minute focus blocks + 5-minute breaks."
+      :agg.gpa>0?"Start small: show up, take notes, ask one question per class."
       :"Add a class to get started — tiny steps, big gains.";
     document.getElementById('quote').textContent = q;
 
-    // confetti once per semester
-    if (agg.gpa>=3.7 && !semesters[currentSem].confettiDone){
-      confetti({ spread: 60, particleCount: 120, origin: { y: 0.8 } });
-      semesters[currentSem].confettiDone = true;
-    }
+    // (Confetti trigger removed)
 
     // chart history
     if (addToHistory && agg.credits>0){
       semesters[currentSem].gpaHistory.push(Number(agg.gpa.toFixed(3)));
     }
-    drawChart(semesters[currentSem].gpaHistory);
+    updateChangeSinceLast();
+    const catStats = computeCategoryStats();
+    drawCharts(semesters[currentSem].gpaHistory, catStats);
 
     saveAll();
   }
 
   // ======= CSV Export =======
   function downloadCSV(){
-    const rows = [["Class","Grade %","Credits","Letter"]];
-    (semesters[currentSem].classes||[]).forEach(c=>rows.push([c.name,c.grade,c.credits,c.letter]));
+    const rows = [["Class","Grade %","Credits","Letter","Category"]];
+    (semesters[currentSem].classes||[]).forEach(c=>rows.push([c.name,c.grade,c.credits,c.letter,c.category||'']));
     const csv = rows.map(r=>r.join(",")).join("\n");
     const blob = new Blob([csv], {type:"text/csv"});
     const link = document.createElement('a');
@@ -445,12 +569,45 @@
     link.click();
   }
 
+  // ======= GPA Forecast =======
+  function forecast(){
+    forecastMsg.textContent = '';
+    const target = Number(forecastTarget.value);
+    const nextC = Number(forecastCredits.value);
+    if(!Number.isFinite(target) || target<=0 || target>4){
+      forecastMsg.textContent = 'Enter a target GPA between 0 and 4.';
+      return;
+    }
+    if(!Number.isFinite(nextC) || nextC<=0){
+      forecastMsg.textContent = 'Enter positive credits for your next class.';
+      return;
+    }
+    const agg = computeAgg();
+    const currentPoints = agg.gpa * agg.credits;
+    const neededTotalPoints = target * (agg.credits + nextC);
+    const neededPointsNext = neededTotalPoints - currentPoints;
+    const neededGPA = neededPointsNext / nextC;
+
+    if(neededGPA <= 0){
+      forecastMsg.textContent = 'You are already above this goal — any passing grade will keep you there.';
+      return;
+    }
+    if(neededGPA > 4){
+      forecastMsg.textContent = 'Even a 4.0 in the next class cannot reach that target GPA.';
+      return;
+    }
+    const neededPct = gpaToPercent(neededGPA);
+    forecastMsg.textContent =
+      `To reach a ${target.toFixed(2)} GPA, you need about a ${neededPct}% (GPA ≈ ${neededGPA.toFixed(2)}) in your next ${nextC} credit class.`;
+  }
+
   // ======= Events =======
-  document.getElementById('addBtn').onclick = addClass;
+  document.getElementById('addBtn').onclick = addOrUpdateClass;
   document.getElementById('clearBtn').onclick = clearAll;
   document.getElementById('printBtn').onclick = ()=>window.print();
   document.getElementById('csvBtn').onclick = downloadCSV;
   document.getElementById('darkBtn').onclick = ()=>{ document.body.classList.toggle('dark'); saveAll(); };
+  document.getElementById('forecastBtn').onclick = forecast;
 
   document.getElementById('saveGoalBtn').onclick = ()=>{
     const v = goalInput.value.trim();
@@ -462,17 +619,15 @@
   semSel.onchange = e => switchSemester(e.target.value);
 
   document.addEventListener('keydown', e=>{
-    if(e.key==='Enter') addClass();
+    if(e.key==='Enter') addOrUpdateClass();
     if(e.ctrlKey && e.shiftKey && e.key==='C') clearAll();
   });
 
   // ======= Init =======
-  // Auto dark mode detection
   if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){
     document.body.classList.add('dark');
   }
 
-  // Quotes
   const dailyQuotes=[
     "Discipline beats motivation.",
     "Consistency builds greatness.",
@@ -482,13 +637,13 @@
   ];
   dailyQuote.textContent = dailyQuotes[Math.floor(Math.random()*dailyQuotes.length)];
 
-  // Load semesters + set up UI
   loadAll();
   refreshSemesterSelect();
   switchSemester(currentSem);
 
-  // Expose for inline handlers
+  // expose for inline handlers
   window.removeClass = removeClass;
+  window.startEdit = startEdit;
 </script>
 </body>
 </html>
