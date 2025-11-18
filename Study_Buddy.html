@@ -8,19 +8,12 @@
     <style>
         :root {
             --page: #faf4ec;
-            /* page bg */
             --panel: #fff5df;
-            /* big left panel */
             --card: #fff7e8;
-            /* inner card */
             --ring: #e9ecff;
-            /* dial ring */
             --gold: #b8922d;
-            /* primary button */
             --gold2: #c49a2e;
-            /* badge grad top */
             --gold3: #a47f24;
-            /* badge grad bottom */
             --text: #111111;
             --muted: #6a6a6a;
             --white: #ffffff;
@@ -38,29 +31,62 @@
             color: var(--text);
         }
 
-        /* Header */
+        /* Top black bar */
+        .topbar {
+            background: #000;
+            color: #fff;
+            padding: 10px 26px;
+            display: flex;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            font-size: 20px;
+        }
+
+        .brand-main {
+            font-weight: 800;
+            color: #ffd700;
+            letter-spacing: 1px;
+        }
+
+        .brand-sub {
+            font-weight: 600;
+        }
+
+        /* Header under bar */
         .hero {
             width: min(1200px, 92vw);
-            margin: 28px auto 0;
-            text-align: center;
+            margin: 24px auto 0;
+            text-align: left;
         }
 
         .hero h1 {
-            margin: 0 0 6px 0;
-            font-size: 28px;
+            margin: 0 0 4px 0;
+            font-size: 32px;
             font-weight: 700;
         }
 
         .hero p {
-            margin: 0 0 18px 0;
+            margin: 0;
             color: var(--muted);
-            font-size: 16px;
+            font-size: 14px;
+        }
+
+        .hero-quote {
+            margin-top: 10px;
+            font-style: italic;
+            color: var(--muted);
+            font-size: 14px;
         }
 
         /* Layout */
         .grid {
             width: min(1200px, 92vw);
-            margin: 0 auto 26px;
+            margin: 18px auto 26px;
             display: grid;
             grid-template-columns: 1fr 360px;
             gap: 22px;
@@ -97,8 +123,9 @@
             border-radius: 50%;
             display: grid;
             place-items: center;
-            background: radial-gradient(closest-side, #ffffff 66%, transparent 67%),
-                conic-gradient(#eef2ff 0deg, #eef2ff 360deg);
+            background:
+                    radial-gradient(closest-side, #ffffff 66%, transparent 67%),
+                    conic-gradient(#eef2ff 0deg, #eef2ff 360deg);
             box-shadow: inset 0 0 0 14px var(--ring);
         }
 
@@ -124,8 +151,28 @@
             font-size: 16px;
         }
 
+        .length-picker {
+            margin-top: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .length-picker select {
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid #e6e6ee;
+            background: #fff;
+            font-family: inherit;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
         .controls {
-            margin-top: 28px;
+            margin-top: 22px;
             display: flex;
             gap: 12px;
             flex-wrap: wrap;
@@ -142,10 +189,13 @@
             background: var(--white);
             color: #1c1c1c;
             font-weight: 700;
-            box-shadow: 0 3px 0 rgba(0, 0, 0, .08), 0 8px 20px rgba(0, 0, 0, .06);
+            box-shadow: 0 3px 0 rgba(0, 0, 0, .08),
+            0 8px 20px rgba(0, 0, 0, .06);
             cursor: pointer;
             user-select: none;
-            transition: transform .02s ease, filter .1s ease, box-shadow .2s ease;
+            transition: transform .02s ease,
+            filter .1s ease,
+            box-shadow .2s ease;
         }
 
         .btn:active {
@@ -161,7 +211,8 @@
             background: var(--gold);
             color: #0f0d05;
             border-color: rgba(0, 0, 0, .10);
-            box-shadow: 0 3px 0 rgba(0, 0, 0, .14), 0 8px 20px rgba(184, 146, 45, .25);
+            box-shadow: 0 3px 0 rgba(0, 0, 0, .14),
+            0 8px 20px rgba(184, 146, 45, .25);
         }
 
         .btn .ico {
@@ -217,245 +268,269 @@
             border: 1px solid rgba(255, 255, 255, .35);
             font-weight: 700;
         }
-
-        /* Quote */
-        .quote {
-            width: min(1200px, 92vw);
-            background: #fff1d7;
-            border: var(--border);
-            margin: 18px auto 40px;
-            border-radius: var(--radius);
-            padding: 18px 24px;
-            box-shadow: 0 10px 24px rgba(0, 0, 0, .06);
-            text-align: center;
-            font-style: italic;
-            color: #4b3b14;
-            font-size: 18px;
-        }
     </style>
 </head>
 
 <body>
-    <section class="hero">
-        <h1>Study Buddy</h1>
-        <p>Stay focused and track your progress with our Pomodoro timer</p>
-    </section>
+<!-- Top black bar -->
+<header class="topbar">
+    <div class="brand">
+        <span class="brand-main">GRIZZY</span>
+        <span class="brand-sub">— Study Buddy</span>
+    </div>
+</header>
 
-    <section class="grid">
-        <!-- Left: Timer panel -->
-        <div class="panel">
-            <div class="timer" aria-label="Study Timer">
-                <div class="dial" aria-live="polite">
-                    <div style="text-align:center">
-                        <svg class="clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                            <circle cx="12" cy="12" r="8" stroke="currentColor"></circle>
-                            <path d="M12 8v5l3 2" stroke-linecap="round" stroke-linejoin="round"></path>
-                        </svg>
-                        <div id="time" class="time">25:00</div>
-                        <div id="state" class="status">Ready to Focus</div>
-                    </div>
-                </div>
+<!-- Title + quote -->
+<section class="hero">
+    <h1>Study Buddy</h1>
+    <p>Stay focused and track your progress with our Pomodoro timer</p>
+    <p class="hero-quote">“Discipline is stronger than motivation.”</p>
+</section>
 
-                <div class="controls" role="group" aria-label="Timer controls">
-                    <button id="btnStart" class="btn primary">
-                        <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                            <path d="M8 5v14l11-7-11-7z"></path>
-                        </svg>
-                        Start
-                    </button>
-                    <button id="btnPause" class="btn" disabled>
-                        <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                            <path d="M7 5h4v14H7zM13 5h4v14h-4z"></path>
-                        </svg>
-                        Pause
-                    </button>
-                    <button id="btnReset" class="btn">
-                        <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                            <path d="M12 6V3L7 7l5 4V8a4 4 0 1 1-3.46 6.03l-1.66 1.11A6 6 0 1 0 12 6z"></path>
-                        </svg>
-                        Reset
-                    </button>
+<section class="grid">
+    <!-- Left: Timer panel -->
+    <div class="panel">
+        <div class="timer" aria-label="Study Timer">
+            <div class="dial" aria-live="polite">
+                <div style="text-align:center">
+                    <svg class="clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <circle cx="12" cy="12" r="8" stroke="currentColor"></circle>
+                        <path d="M12 8v5l3 2" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
+                    <div id="time" class="time">25:00</div>
+                    <div id="state" class="status">Ready to Focus</div>
                 </div>
+            </div>
+
+            <!-- Session length picker -->
+            <div class="length-picker">
+                <span>Session length</span>
+                <select id="sessionLength">
+                    <option value="5">5 minutes</option>
+                    <option value="10">10 minutes</option>
+                    <option value="25" selected>25 minutes</option>
+                </select>
+            </div>
+
+            <div class="controls" role="group" aria-label="Timer controls">
+                <button id="btnStart" class="btn primary">
+                    <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M8 5v14l11-7-11-7z"></path>
+                    </svg>
+                    Start
+                </button>
+                <button id="btnPause" class="btn" disabled>
+                    <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M7 5h4v14H7zM13 5h4v14h-4z"></path>
+                    </svg>
+                    Pause
+                </button>
+                <button id="btnReset" class="btn">
+                    <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M12 6V3L7 7l5 4V8a4 4 0 1 1-3.46 6.03l-1.66 1.11A6 6 0 1 0 12 6z"></path>
+                    </svg>
+                    Reset
+                </button>
             </div>
         </div>
+    </div>
 
-        <!-- Right: Stats (powered by localStorage, no backend) -->
-        <aside class="col" aria-label="Study Stats">
-            <div class="stat">
-                <h4>Today’s Sessions <span class="small">🕘</span></h4>
-                <div class="val" id="statSessions">0</div>
-            </div>
+    <!-- Right: Stats (powered by localStorage, no backend) -->
+    <aside class="col" aria-label="Study Stats">
+        <div class="stat">
+            <h4>Today’s Sessions <span class="small">🕘</span></h4>
+            <div class="val" id="statSessions">0</div>
+        </div>
 
-            <div class="stat">
-                <h4>Total Focus Time <span class="small">📈</span></h4>
-                <div class="val"><span id="statMinutes">0</span> min</div>
-            </div>
+        <div class="stat">
+            <h4>Total Focus Time <span class="small">📈</span></h4>
+            <div class="val"><span id="statMinutes">0</span> min</div>
+        </div>
 
-            <div class="stat">
-                <h4>Weekly Streak <span class="small">🔥</span></h4>
-                <div class="val" id="statStreak">0 Days</div>
-            </div>
+        <div class="stat">
+            <h4>Weekly Streak <span class="small">🔥</span></h4>
+            <div class="val" id="statStreak">0 Days</div>
+        </div>
 
-            <div class="badge" role="note" id="coachNote">
-                💬 <span><strong>Keep Going!</strong> You’ve got this — start your first session.</span>
-            </div>
-        </aside>
-    </section>
+        <div class="badge" role="note" id="coachNote">
+            💬 <span><strong>Keep Going!</strong> You’ve got this — start your first session.</span>
+        </div>
+    </aside>
+</section>
 
-    <div class="quote">“Discipline is stronger than motivation.”</div>
+<script>
+    // ===== Local storage keys & helpers (no backend) =====
+    const KEY_SESS = 'grizzy.study.sessionsByDate';   // { 'YYYY-MM-DD': sessionCount }
+    const KEY_MIN = 'grizzy.study.minutesByDate';     // { 'YYYY-MM-DD': totalMinutes }
 
-    <script>
-        // ===== Local storage keys & helpers (no backend) =====
-        const KEY = 'grizzy.study.sessionsByDate'; // { 'YYYY-MM-DD': number }
-        const MIN_PER_SESSION = 25;
+    const todayISO = (d = new Date()) => {
+        const z = n => String(n).padStart(2, '0');
+        return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate());
+    };
 
-        const todayISO = (d = new Date()) => {
-            const z = n => String(n).padStart(2, '0');
-            return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate());
-        };
+    function loadMap(key) {
+        try { return JSON.parse(localStorage.getItem(key)) || {}; }
+        catch (e) { return {}; }
+    }
+    function saveMap(key, map) {
+        localStorage.setItem(key, JSON.stringify(map));
+    }
 
-        function loadMap() {
-            try { return JSON.parse(localStorage.getItem(KEY)) || {}; }
-            catch (e) { return {}; }
-        }
-        function saveMap(map) { localStorage.setItem(KEY, JSON.stringify(map)); }
-        function incToday() {
-            const map = loadMap();
-            const k = todayISO();
-            map[k] = (map[k] || 0) + 1;
-            saveMap(map);
-            return map[k];
-        }
+    function recordSession(minutes) {
+        const sess = loadMap(KEY_SESS);
+        const mins = loadMap(KEY_MIN);
+        const k = todayISO();
 
-        // Consecutive-day streak ending today
-        function computeStreak(map) {
-            let streak = 0;
-            for (let i = 0; i < 30; i++) { // look back up to a month
-                const d = new Date();
-                d.setDate(d.getDate() - i);
-                const k = todayISO(d);
-                const has = (map[k] || 0) > 0;
-                if (i === 0) {
-                    if (!has) return 0; // today has none → streak 0
-                    streak = 1;
-                } else {
-                    if (!has) break;
-                    streak++;
-                }
-            }
-            return streak;
-        }
+        sess[k] = (sess[k] || 0) + 1;
+        mins[k] = (mins[k] || 0) + minutes;
 
-        function pctChangeTodayVsYesterday(map) {
-            const d0 = todayISO();
-            const d1 = todayISO(new Date(Date.now() - 86400000));
-            const t0 = (map[d0] || 0) * MIN_PER_SESSION;
-            const t1 = (map[d1] || 0) * MIN_PER_SESSION;
-            if (t1 === 0 && t0 > 0) return 100;    // special case
-            if (t1 === 0 && t0 === 0) return 0;
-            return Math.round(((t0 - t1) / t1) * 100);
-        }
+        saveMap(KEY_SESS, sess);
+        saveMap(KEY_MIN, mins);
+    }
 
-        // ===== UI elements =====
-        const timeEl = document.getElementById('time');
-        const stateEl = document.getElementById('state');
-        const btnStart = document.getElementById('btnStart');
-        const btnPause = document.getElementById('btnPause');
-        const btnReset = document.getElementById('btnReset');
-
-        const statSessions = document.getElementById('statSessions');
-        const statMinutes = document.getElementById('statMinutes');
-        const statStreak = document.getElementById('statStreak');
-        const coachNote = document.getElementById('coachNote');
-
-        // ===== Timer =====
-        let seconds = 25 * 60;
-        let timerId = null;
-        let running = false;
-
-        const fmt = (s) => {
-            const m = Math.floor(s / 60).toString().padStart(2, '0');
-            const r = (s % 60).toString().padStart(2, '0');
-            return m + ':' + r;
-        };
-        const paint = () => { timeEl.textContent = fmt(seconds); };
-        const setRunning = (on) => {
-            running = on;
-            btnStart.disabled = on;
-            btnPause.disabled = !on;
-        };
-
-        function refreshStats() {
-            const map = loadMap();
-            const today = map[todayISO()] || 0;
-            const minutes = today * MIN_PER_SESSION;
-            const streak = computeStreak(map);
-
-            statSessions.textContent = String(today);
-            statMinutes.textContent = String(minutes);
-            statStreak.textContent = (streak || 0) + (streak === 1 ? ' Day' : ' Days');
-
-            const pct = pctChangeTodayVsYesterday(map);
-            if (minutes === 0) {
-                coachNote.innerHTML = '💬 <span><strong>Keep Going!</strong> You’ve got this — start your first session.</span>';
-            } else if (pct > 0) {
-                coachNote.innerHTML = '💬 <span><strong>Keep Going!</strong> You\'ve studied ' + pct + '% more than yesterday — keep it up!</span>';
-            } else if (pct < 0) {
-                coachNote.innerHTML = '💬 <span><strong>You got this.</strong> A little less than yesterday — one more session?</span>';
+    // Consecutive-day streak ending today (based on sessions)
+    function computeStreak(sessionMap) {
+        let streak = 0;
+        for (let i = 0; i < 30; i++) { // look back up to a month
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const k = todayISO(d);
+            const has = (sessionMap[k] || 0) > 0;
+            if (i === 0) {
+                if (!has) return 0; // today has none → streak 0
+                streak = 1;
             } else {
-                coachNote.innerHTML = '💬 <span><strong>Nice.</strong> You\'re matching yesterday — consistency wins.</span>';
+                if (!has) break;
+                streak++;
             }
         }
+        return streak;
+    }
 
-        function onSessionComplete() {
-            incToday();
-            refreshStats();
+    function pctChangeTodayVsYesterday(minutesMap) {
+        const d0 = todayISO();
+        const d1 = todayISO(new Date(Date.now() - 86400000));
+        const t0 = minutesMap[d0] || 0;
+        const t1 = minutesMap[d1] || 0;
+        if (t1 === 0 && t0 > 0) return 100; // special case
+        if (t1 === 0 && t0 === 0) return 0;
+        return Math.round(((t0 - t1) / t1) * 100);
+    }
+
+    // ===== UI elements =====
+    const timeEl = document.getElementById('time');
+    const stateEl = document.getElementById('state');
+    const btnStart = document.getElementById('btnStart');
+    const btnPause = document.getElementById('btnPause');
+    const btnReset = document.getElementById('btnReset');
+    const lengthSelect = document.getElementById('sessionLength');
+
+    const statSessions = document.getElementById('statSessions');
+    const statMinutes = document.getElementById('statMinutes');
+    const statStreak = document.getElementById('statStreak');
+    const coachNote = document.getElementById('coachNote');
+
+    // ===== Timer =====
+    let sessionMinutes = parseInt(lengthSelect.value, 10) || 25;
+    let seconds = sessionMinutes * 60;
+    let timerId = null;
+    let running = false;
+
+    const fmt = (s) => {
+        const m = Math.floor(s / 60).toString().padStart(2, '0');
+        const r = (s % 60).toString().padStart(2, '0');
+        return m + ':' + r;
+    };
+    const paint = () => { timeEl.textContent = fmt(seconds); };
+    const setRunning = (on) => {
+        running = on;
+        btnStart.disabled = on;
+        btnPause.disabled = !on;
+        lengthSelect.disabled = on; // lock duration while running
+    };
+
+    function refreshStats() {
+        const sessionsMap = loadMap(KEY_SESS);
+        const minutesMap = loadMap(KEY_MIN);
+        const todayKey = todayISO();
+
+        const todaySessions = sessionsMap[todayKey] || 0;
+        const todayMinutes = minutesMap[todayKey] || 0;
+        const streak = computeStreak(sessionsMap);
+
+        statSessions.textContent = String(todaySessions);
+        statMinutes.textContent = String(todayMinutes);
+        statStreak.textContent = (streak || 0) + (streak === 1 ? ' Day' : ' Days');
+
+        const pct = pctChangeTodayVsYesterday(minutesMap);
+        if (todayMinutes === 0) {
+            coachNote.innerHTML = '💬 <span><strong>Keep Going!</strong> You’ve got this — start your first session.</span>';
+        } else if (pct > 0) {
+            coachNote.innerHTML = '💬 <span><strong>Keep Going!</strong> You\'ve studied ' + pct + '% more than yesterday — keep it up!</span>';
+        } else if (pct < 0) {
+            coachNote.innerHTML = '💬 <span><strong>You got this.</strong> A little less than yesterday — one more session?</span>';
+        } else {
+            coachNote.innerHTML = '💬 <span><strong>Nice.</strong> You\'re matching yesterday — consistency wins.</span>';
         }
+    }
 
-        function tick() {
-            seconds = Math.max(0, seconds - 1);
-            paint();
-            if (seconds === 0) {
-                clearInterval(timerId);
-                timerId = null;
-                setRunning(false);
-                stateEl.textContent = 'Session complete! Take a short break.';
-                onSessionComplete();
-            }
-        }
-
-        function start() {
-            if (running) return;
-            setRunning(true);
-            stateEl.textContent = 'Focusing…';
-            timerId = setInterval(tick, 1000);
-        }
-
-        function pause() {
-            if (!running) return;
-            clearInterval(timerId);
-            timerId = null;
-            setRunning(false);
-            stateEl.textContent = 'Paused';
-        }
-
-        function reset() {
-            clearInterval(timerId);
-            timerId = null;
-            seconds = 25 * 60;
-            setRunning(false);
-            paint();
-            stateEl.textContent = 'Ready to Focus';
-        }
-
-        btnStart.addEventListener('click', start);
-        btnPause.addEventListener('click', pause);
-        btnReset.addEventListener('click', reset);
-
-        // Initial paint & stats
-        paint();
+    function onSessionComplete() {
+        recordSession(sessionMinutes);
         refreshStats();
-    </script>
+    }
+
+    function tick() {
+        seconds = Math.max(0, seconds - 1);
+        paint();
+        if (seconds === 0) {
+            clearInterval(timerId);
+            timerId = null;
+            setRunning(false);
+            stateEl.textContent = 'Session complete! Take a short break.';
+            onSessionComplete();
+        }
+    }
+
+    function start() {
+        if (running) return;
+        setRunning(true);
+        stateEl.textContent = 'Focusing…';
+        timerId = setInterval(tick, 1000);
+    }
+
+    function pause() {
+        if (!running) return;
+        clearInterval(timerId);
+        timerId = null;
+        setRunning(false);
+        stateEl.textContent = 'Paused';
+    }
+
+    function reset() {
+        clearInterval(timerId);
+        timerId = null;
+        seconds = sessionMinutes * 60;
+        setRunning(false);
+        paint();
+        stateEl.textContent = 'Ready to Focus';
+    }
+
+    // Change session length when not running
+    lengthSelect.addEventListener('change', () => {
+        if (running) return;
+        sessionMinutes = parseInt(lengthSelect.value, 10) || 25;
+        seconds = sessionMinutes * 60;
+        paint();
+    });
+
+    btnStart.addEventListener('click', start);
+    btnPause.addEventListener('click', pause);
+    btnReset.addEventListener('click', reset);
+
+    // Initial paint & stats
+    paint();
+    refreshStats();
+</script>
 </body>
 
 </html>
