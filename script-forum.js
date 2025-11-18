@@ -14,23 +14,38 @@ let selectedClassName = null;
 let selectedDiscussionId = null;
 let selectedCommentId = null;
 
-// Fetch and render discussions
 async function fetchDiscussions() {
     try {
-        const res = await fetch(`${API_BASE}/classDiscussions`);
-        discussions = await res.json();
+        const cached = localStorage.getItem("cachedDiscussions");
+        if (cached) {
+            discussions = JSON.parse(cached);
 
-        renderSidebar(discussions);
-        renderClassDropdown(discussions);
+            renderSidebar(discussions);
+            renderClassDropdown(discussions);
+            renderDiscussions(
+                selectedClassName ? discussions.filter(d => d.name === selectedClassName) : discussions
+            );
+        }
+
+        const res = await fetch(`${API_BASE}/classDiscussions`);
+        const fresh = await res.json();
+
+        discussions = fresh;
+
+        localStorage.setItem("cachedDiscussions", JSON.stringify(fresh));
+
+        renderSidebar(fresh);
+        renderClassDropdown(fresh);
         renderDiscussions(
-            selectedClassName ? discussions.filter(d => d.name === selectedClassName) : discussions
+            selectedClassName ? fresh.filter(d => d.name === selectedClassName) : fresh
         );
+
     } catch (err) {
         console.error("Failed to fetch discussions:", err);
     }
 }
 
-// Sidebar
+
 function renderSidebar(discussions) {
     classList.innerHTML = `
     <li class="${!selectedClassName ? "active" : ""}" onclick="filterByClass(null)">All Classes</li>
@@ -55,14 +70,12 @@ function filterByClass(className) {
     );
 }
 
-// Class dropdown for comment modal
 function renderClassDropdown(discussions) {
     commentClassSelect.innerHTML = discussions
         .map((d) => `<option value="${d.id}">${d.name}</option>`)
         .join("");
 }
 
-// Render discussions, comments, replies
 function renderDiscussions(discussionsToRender) {
     discussionsDiv.innerHTML = "";
 
@@ -114,14 +127,12 @@ function renderDiscussions(discussionsToRender) {
     });
 }
 
-// Toggle replies
 function toggleReplies(commentId) {
     const container = document.getElementById(`replies-${commentId}`);
     if (!container) return;
     container.style.display = container.style.display === "block" ? "none" : "block";
 }
 
-// Create new class
 document.getElementById("newDiscussionBtn").onclick = () => {
     discussionModal.style.display = "flex";
 };
@@ -144,7 +155,6 @@ document.getElementById("createDiscussionBtn").onclick = async () => {
     }
 };
 
-// Add comment
 document.getElementById("addCommentBtn").onclick = () => {
     commentModal.style.display = "flex";
 };
@@ -169,7 +179,6 @@ document.getElementById("submitCommentBtn").onclick = async () => {
     }
 };
 
-// Add reply
 function openReplyPrompt(commentId) {
     selectedCommentId = commentId;
     replyModal.style.display = "flex";
@@ -194,7 +203,6 @@ document.getElementById("submitReplyBtn").onclick = async () => {
     }
 };
 
-// Modal handling
 function closeModals() {
     document.querySelectorAll(".modal").forEach((m) => (m.style.display = "none"));
 }
@@ -203,7 +211,6 @@ document.querySelectorAll(".closeModal").forEach((btn) => {
     btn.onclick = closeModals;
 });
 
-// Initialize
 fetchDiscussions();
 
 
