@@ -17,14 +17,19 @@ let selectedCommentId = null;
 async function fetchDiscussions() {
     try {
         const cached = localStorage.getItem("cachedDiscussions");
-        if (cached) {
-            discussions = JSON.parse(cached);
 
-            renderSidebar(discussions);
-            renderClassDropdown(discussions);
-            renderDiscussions(
-                selectedClassName ? discussions.filter(d => d.name === selectedClassName) : discussions
-            );
+        if (cached) {
+            const parsed = JSON.parse(cached);
+
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                discussions = parsed;
+
+                renderSidebar(discussions);
+                renderClassDropdown(discussions);
+                renderDiscussions(
+                    selectedClassName ? discussions.filter(d => d.name === selectedClassName) : discussions
+                );
+            }
         }
 
         const res = await fetch(`${API_BASE}/classDiscussions`);
@@ -32,7 +37,9 @@ async function fetchDiscussions() {
 
         discussions = fresh;
 
-        localStorage.setItem("cachedDiscussions", JSON.stringify(fresh));
+        if (Array.isArray(fresh) && fresh.length > 0) {
+            localStorage.setItem("cachedDiscussions", JSON.stringify(fresh));
+        }
 
         renderSidebar(fresh);
         renderClassDropdown(fresh);
@@ -44,6 +51,7 @@ async function fetchDiscussions() {
         console.error("Failed to fetch discussions:", err);
     }
 }
+
 
 
 function renderSidebar(discussions) {
