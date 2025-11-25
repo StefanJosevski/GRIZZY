@@ -218,6 +218,14 @@ body {
     margin-top: 1rem;
 }
 
+.header {
+    background: #000; /* Black background */
+    color: #fff;      /* White text */
+}
+
+.header h1 {
+    color: #fff;      /* Ensure header title stays white */
+}
 
 
 
